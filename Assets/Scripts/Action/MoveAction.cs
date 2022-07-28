@@ -2,9 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoveAction : MonoBehaviour
+public class MoveAction : BaseAction
 {
-    private Unit unit;
     private Animator unitAnimator;
 
     private float rotateSpeed = 10f;
@@ -14,21 +13,26 @@ public class MoveAction : MonoBehaviour
     private Vector3 movePosition;
 
 
-    private void Awake()
+    protected override void Awake()
     {
-        unit = GetComponent<Unit>();
+        base.Awake();
         unitAnimator = GetComponentInChildren<Animator>();
         this.movePosition = transform.position;
     }
 
     private void Update()
     {
+        if (!isActive)
+        {
+            return;
+        }
         HandleMove();
     }
 
     public void SetMovePosition(GridPosition inputGridPosition)
     {
         this.movePosition = LevelGrid.Instance.GetWorldPositionInLevelGrid(inputGridPosition);
+        isActive = true;
     }
 
     public void HandleMove()
@@ -42,6 +46,7 @@ public class MoveAction : MonoBehaviour
         }
         else
         {
+            isActive = false;
             unitAnimator.SetBool("IsMoving", false);
         }
     }
