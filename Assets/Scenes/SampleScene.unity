@@ -495,7 +495,7 @@ GameObject:
   - component: {fileID: 457953746}
   - component: {fileID: 457953747}
   m_Layer: 0
-  m_Name: UnitSelectionSystem
+  m_Name: UnitActionSystem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -531,6 +531,7 @@ MonoBehaviour:
   unitsLayerMask:
     serializedVersion: 2
     m_Bits: 128
+  isBusy: 0
 --- !u!1 &483054742
 GameObject:
   m_ObjectHideFlags: 0
@@ -561,7 +562,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unit: {fileID: 1575900032}
-  gridSystemVisual: {fileID: 2407073}
 --- !u!4 &483054744
 Transform:
   m_ObjectHideFlags: 0

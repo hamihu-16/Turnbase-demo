@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -29,8 +30,9 @@ public class MoveAction : BaseAction
         HandleMove();
     }
 
-    public void SetMovePosition(GridPosition inputGridPosition)
+    public void SetMovePosition(GridPosition inputGridPosition, Action onActionComplete)
     {
+        this.onActionComplete = onActionComplete;
         this.movePosition = LevelGrid.Instance.GetWorldPositionInLevelGrid(inputGridPosition);
         isActive = true;
     }
@@ -48,6 +50,7 @@ public class MoveAction : BaseAction
         {
             isActive = false;
             unitAnimator.SetBool("IsMoving", false);
+            onActionComplete();
         }
     }
 
