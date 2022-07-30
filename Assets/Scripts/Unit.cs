@@ -6,11 +6,12 @@ public class Unit : MonoBehaviour
 {
     private GridPosition gridPosition;
     private MoveAction moveAction;
-    
+    private BaseAction[] baseActionArray;
 
     private void Awake()
     {
         moveAction = GetComponent<MoveAction>();
+        baseActionArray = GetComponents<BaseAction>();
     }
 
     private void Start()
@@ -21,7 +22,6 @@ public class Unit : MonoBehaviour
 
     private void Update()
     {
-        //HandleMove();
         HandleUnitGridPosition();
     }
 
@@ -43,5 +43,10 @@ public class Unit : MonoBehaviour
     public GridPosition GetGridPosition()
     {
         return this.gridPosition;
+    }
+
+    public BaseAction[] GetBaseActionArray()
+    {
+        return this.baseActionArray;
     }
 }

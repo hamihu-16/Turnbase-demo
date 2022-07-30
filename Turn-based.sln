@@ -111,6 +111,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.VisualScripting.Share
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com.unity.cinemachine.editor", "com.unity.cinemachine.editor.csproj", "{320E4F4F-9480-CA14-9F4B-95A142E6F4AA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.2D.Sprite.Editor", "Unity.2D.Sprite.Editor.csproj", "{831D53CD-2A8E-5BAD-0A3B-398348A3DF18}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityEngine.UI", "UnityEngine.UI.Player.csproj", "{7D65CA90-D182-4F52-B88C-A735CF0890A5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.RenderPipelines.Core.Runtime", "Unity.RenderPipelines.Core.Runtime.Player.csproj", "{ADE6C8E0-AEC0-7CAD-61AB-6D9E1DE42ECF}"
@@ -395,6 +397,10 @@ Global
 		{320E4F4F-9480-CA14-9F4B-95A142E6F4AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{320E4F4F-9480-CA14-9F4B-95A142E6F4AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{320E4F4F-9480-CA14-9F4B-95A142E6F4AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{831D53CD-2A8E-5BAD-0A3B-398348A3DF18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{831D53CD-2A8E-5BAD-0A3B-398348A3DF18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{831D53CD-2A8E-5BAD-0A3B-398348A3DF18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{831D53CD-2A8E-5BAD-0A3B-398348A3DF18}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7D65CA90-D182-4F52-B88C-A735CF0890A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7D65CA90-D182-4F52-B88C-A735CF0890A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D65CA90-D182-4F52-B88C-A735CF0890A5}.Release|Any CPU.ActiveCfg = Release|Any CPU

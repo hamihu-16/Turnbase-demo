@@ -27,17 +27,17 @@ public class MoveAction : BaseAction
         {
             return;
         }
-        HandleMove();
+        HandleAction();
     }
 
-    public void SetMovePosition(GridPosition inputGridPosition, Action onActionComplete)
+    public override void PerformAction(GridPosition inputGridPosition, Action onActionComplete)
     {
         this.onActionComplete = onActionComplete;
         this.movePosition = LevelGrid.Instance.GetWorldPositionInLevelGrid(inputGridPosition);
         isActive = true;
     }
 
-    public void HandleMove()
+    public void HandleAction()
     {
         if (Vector3.Distance(transform.position, movePosition) >= stoppingDistance)
         {
@@ -48,13 +48,13 @@ public class MoveAction : BaseAction
         }
         else
         {
-            isActive = false;
             unitAnimator.SetBool("IsMoving", false);
+            isActive = false;
             onActionComplete();
         }
     }
 
-    public List<GridPosition> GetValidGridPositionList()
+    public override List<GridPosition> GetValidGridPositionList()
     {
         List<GridPosition> validGridPositionList = new List<GridPosition>();
         GridPosition unitGridPosition = unit.GetGridPosition();
@@ -76,8 +76,8 @@ public class MoveAction : BaseAction
         return validGridPositionList;
     }
 
-    public bool IsValidGridPosition(GridPosition gridPosition)
+    public override string GetActionName()
     {
-        return GetValidGridPositionList().Contains(gridPosition);
+        return "Move";
     }
 }
