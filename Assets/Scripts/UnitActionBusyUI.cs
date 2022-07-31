@@ -16,12 +16,10 @@ public class UnitActionBusyUI : MonoBehaviour
     {
         if (UnitActionSystem.Instance.GetBusy())
         {
-            Debug.Log("setactive true");
             unitActionBusyUI.SetActive(true);
         }
         else
         {
-            Debug.Log("setactive false");
             unitActionBusyUI.SetActive(false);
         }
     }

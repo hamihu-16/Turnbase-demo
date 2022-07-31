@@ -3,12 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class UnitActionSystemUI : MonoBehaviour
 {
     [SerializeField] private Transform unitActionButtonUIPrefab;
     [SerializeField] private Transform unitActionButtonContainer;
     [SerializeField] private Transform unitActionBusyUI;
+    [SerializeField] private Transform actionPointsUI;
 
     private List<UnitActionButtonUI> unitActionButtonUIList;
 
@@ -16,7 +18,9 @@ public class UnitActionSystemUI : MonoBehaviour
     {
         UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
         UnitActionSystem.Instance.OnSelectedActionChanged += UnitActionSystem_OnSelectedActionChanged;
-        UnitActionSystem.Instance.OnBusyChanged += UnitActionSystem_OnBusyChanged;
+        UnitActionSystem.Instance.OnActionStarted += UnitActionSystem_OnActionStarted;
+        TurnSystem.Instance.OnTurnEnd += TurnSystem_OnTurnEnd;
+
         unitActionButtonUIList = new List<UnitActionButtonUI>();
     }
 
@@ -49,11 +53,27 @@ public class UnitActionSystemUI : MonoBehaviour
         }
     }
 
+    private void HandleActionPointUI()
+    {
+        Unit selectedUnit = UnitActionSystem.Instance.GetSelectedUnit();
+        if (selectedUnit != null)
+        {
+            actionPointsUI.gameObject.SetActive(true);
+            actionPointsUI.GetComponent<TextMeshProUGUI>().text = "Action Points Remaining: " + selectedUnit.GetActionPoints();
+        }
+        else
+        {
+            actionPointsUI.gameObject.SetActive(false);
+        }        
+    }
+
+
     private void UnitActionSystem_OnSelectedUnitChanged(object sender, EventArgs e)
     {
         ClearUnitActionButtons();
         CreateUnitActionButtons();
         UpdateSelectedButtonVisual();
+        HandleActionPointUI();
     }
 
     private void UnitActionSystem_OnSelectedActionChanged(object sender, EventArgs e)
@@ -61,9 +81,14 @@ public class UnitActionSystemUI : MonoBehaviour
         UpdateSelectedButtonVisual();
     }
 
-    private void UnitActionSystem_OnBusyChanged(object sender, EventArgs e)
+    private void UnitActionSystem_OnActionStarted(object sender, EventArgs e)
     {
-        Debug.Log("UnitActionSystem_OnBusyChanged" + UnitActionSystem.Instance.GetBusy());
-        unitActionBusyUI.GetComponent<UnitActionBusyUI>().UpdateActionBusy();
+        HandleActionPointUI();
     }
+
+    private void TurnSystem_OnTurnEnd(object sender, EventArgs e)
+    {
+        HandleActionPointUI();
+    }
+
 }

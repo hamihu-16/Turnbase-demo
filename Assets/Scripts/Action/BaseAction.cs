@@ -8,6 +8,7 @@ public abstract class BaseAction : MonoBehaviour
     protected Unit unit;
     protected bool isActive;
     protected Action onActionComplete;
+    protected int actionCost;
 
     protected virtual void Awake()
     {
@@ -25,4 +26,6 @@ public abstract class BaseAction : MonoBehaviour
     public abstract List<GridPosition> GetValidGridPositionList();
 
     public abstract void PerformAction(GridPosition gridPosition, Action onActionCompleted);
+
+    public abstract int GetActionCost();
 }

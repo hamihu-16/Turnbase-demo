@@ -12,13 +12,14 @@ public class MoveAction : BaseAction
     private float stoppingDistance = 0.1f;
     private int moveRange = 2;
     private Vector3 movePosition;
-
+    
 
     protected override void Awake()
     {
         base.Awake();
         unitAnimator = GetComponentInChildren<Animator>();
         this.movePosition = transform.position;
+        actionCost = 1;
     }
 
     private void Update()
@@ -79,5 +80,10 @@ public class MoveAction : BaseAction
     public override string GetActionName()
     {
         return "Move";
+    }
+
+    public override int GetActionCost()
+    {
+        return this.actionCost;
     }
 }

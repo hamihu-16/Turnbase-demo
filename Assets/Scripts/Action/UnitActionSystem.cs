@@ -10,6 +10,7 @@ public class UnitActionSystem : MonoBehaviour
     public event EventHandler OnSelectedUnitChanged;
     public event EventHandler OnSelectedActionChanged;
     public event EventHandler OnBusyChanged;
+    public event EventHandler OnActionStarted;
 
     private Unit selectedUnit;
     private BaseAction selectedAction;
@@ -76,11 +77,16 @@ public class UnitActionSystem : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPositionInLevelGrid(MouseWorld.GetMousePosition());
-
+            if (!selectedUnit.EnoughActionPointsToPerformAction(selectedAction))
+            {
+                return;
+            }
             if (selectedAction.IsValidGridPosition(mouseGridPosition))
             {
                 SetBusy();
+                selectedUnit.SpendActionPoints(selectedAction);
                 selectedAction.PerformAction(mouseGridPosition, ClearBusy);
+                OnActionStarted?.Invoke(this, EventArgs.Empty);
             }
         }
     }
