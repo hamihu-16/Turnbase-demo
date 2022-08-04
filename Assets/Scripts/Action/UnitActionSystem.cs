@@ -40,6 +40,10 @@ public class UnitActionSystem : MonoBehaviour
         {
             return;
         }
+        if (!TurnSystem.Instance.IsPlayerTurn())
+        {
+            return;
+        }
         if (TryHandleUnitSelection())
         {
             return;
@@ -60,7 +64,7 @@ public class UnitActionSystem : MonoBehaviour
             {
                 if (raycastHit.transform.TryGetComponent<Unit>(out Unit unit))
                 {
-                    if (unit == selectedUnit)
+                    if (unit == selectedUnit || unit.IsEnemy())
                     {
                         return false;
                     }
@@ -101,7 +105,7 @@ public class UnitActionSystem : MonoBehaviour
 
     public Unit GetSelectedUnit()
     {
-        return this.selectedUnit;   
+        return this.selectedUnit;
     }
 
     public void ClearBusy()

@@ -5,19 +5,18 @@ using UnityEngine;
 
 public class MoveAction : BaseAction
 {
-    private Animator unitAnimator;
-
     private float rotateSpeed = 10f;
     private float moveSpeed = 5f;
     private float stoppingDistance = 0.1f;
     private int moveRange = 2;
     private Vector3 movePosition;
-    
+
+    public event EventHandler OnStartMoving;
+    public event EventHandler OnStopMoving;
 
     protected override void Awake()
     {
         base.Awake();
-        unitAnimator = GetComponentInChildren<Animator>();
         this.movePosition = transform.position;
         actionCost = 1;
     }
@@ -33,9 +32,9 @@ public class MoveAction : BaseAction
 
     public override void PerformAction(GridPosition inputGridPosition, Action onActionComplete)
     {
-        this.onActionComplete = onActionComplete;
+        ActionStart(onActionComplete);
         this.movePosition = LevelGrid.Instance.GetWorldPositionInLevelGrid(inputGridPosition);
-        isActive = true;
+        OnStartMoving?.Invoke(this, EventArgs.Empty);
     }
 
     public void HandleAction()
@@ -45,13 +44,11 @@ public class MoveAction : BaseAction
             Vector3 moveDirection = (movePosition - transform.position).normalized;
             transform.position += moveDirection * moveSpeed * Time.deltaTime;
             transform.forward = Vector3.Lerp(transform.forward, moveDirection, rotateSpeed * Time.deltaTime);
-            unitAnimator.SetBool("IsMoving", true);
         }
         else
         {
-            unitAnimator.SetBool("IsMoving", false);
-            isActive = false;
-            onActionComplete();
+            OnStopMoving?.Invoke(this, EventArgs.Empty);
+            ActionComplete();
         }
     }
 

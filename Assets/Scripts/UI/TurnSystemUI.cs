@@ -9,6 +9,7 @@ public class TurnSystemUI : MonoBehaviour
 {
     private Button endTurnButton;
     private TextMeshProUGUI turnTextMeshPro;
+    [SerializeField] private GameObject enemyTurnUI;
 
     private void Awake()
     {
@@ -37,5 +38,18 @@ public class TurnSystemUI : MonoBehaviour
     private void TurnSystem_OnTurnEnd(object sender, EventArgs e)
     {
         UpdateTurnText();
+        UpdateEnemyTurnUI();
+    }
+
+    private void UpdateEnemyTurnUI()
+    {
+        if (TurnSystem.Instance.IsPlayerTurn())
+        {
+            enemyTurnUI.SetActive(false);
+        }
+        else
+        {
+            enemyTurnUI.SetActive(true);
+        } 
     }
 }

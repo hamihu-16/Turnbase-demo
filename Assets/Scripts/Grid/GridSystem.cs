@@ -46,8 +46,8 @@ public class GridSystem
             {
                 GridPosition gridPosition = new GridPosition(i, j);
                 Transform textPrefabTransform = Transform.Instantiate(textPrefab, GridToWorldPosition(gridPosition), Quaternion.identity);
-                GridObjectDebug gridTextDebug = textPrefabTransform.GetComponent<GridObjectDebug>();
-                gridTextDebug.SetGridObject(GetGridObjectFromGridPosition(gridPosition));
+                GridObjectDebug gridObjectDebug = textPrefabTransform.GetComponent<GridObjectDebug>();
+                gridObjectDebug.SetGridObject(GetGridObjectFromGridPosition(gridPosition));
             }
         }
     }

@@ -5,17 +5,25 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour
 {
-    private const int MAX_ACTION_POINTS = 2;
+    protected const int MAX_ACTION_POINTS = 2;
 
-    private GridPosition gridPosition;
-    private MoveAction moveAction;
-    private BaseAction[] baseActionArray;
-    private int actionPoints = MAX_ACTION_POINTS;
+    protected GridPosition gridPosition;
+
+    protected HealthSystem healthSystem;
+    protected BaseAction[] baseActionArray;
+    protected MoveAction moveAction;
+    protected ShootAction shootAction;
+
+    protected int actionPoints = MAX_ACTION_POINTS;
+
+    [SerializeField] protected bool isEnemy;
 
     private void Awake()
     {
-        moveAction = GetComponent<MoveAction>();
+        healthSystem = GetComponent<HealthSystem>();
         baseActionArray = GetComponents<BaseAction>();
+        moveAction = GetComponent<MoveAction>();
+        shootAction = GetComponent<ShootAction>();
     }
 
     private void Start()
@@ -24,6 +32,7 @@ public class Unit : MonoBehaviour
         LevelGrid.Instance.AddUnitAtGridPosition(gridPosition, this);
 
         TurnSystem.Instance.OnTurnEnd += TurnSystem_OnTurnEnd;
+        healthSystem.OnDead += HealthSystem_OnDead;
     }
 
     private void Update()
@@ -46,9 +55,19 @@ public class Unit : MonoBehaviour
         return this.moveAction;
     }
 
+    public ShootAction GetShoot()
+    {
+        return this.shootAction;
+    }
+
     public GridPosition GetGridPosition()
     {
         return this.gridPosition;
+    }
+
+    public Vector3 GetWorldPosition()
+    {
+        return transform.position;
     }
 
     public BaseAction[] GetBaseActionArray()
@@ -74,9 +93,29 @@ public class Unit : MonoBehaviour
     {
         this.actionPoints -= baseAction.GetActionCost();
     }
+    public bool IsEnemy()
+    {
+        return this.isEnemy;
+    }
+
+    public void TakeDamage(float damage)
+    {
+        healthSystem.TakeDamage(damage);
+    }
 
     public void TurnSystem_OnTurnEnd(object sender, EventArgs e)
     {
-        this.actionPoints = MAX_ACTION_POINTS;
+        if ((isEnemy && !TurnSystem.Instance.IsPlayerTurn()) 
+            || (!isEnemy && TurnSystem.Instance.IsPlayerTurn()))
+        {
+            this.actionPoints = MAX_ACTION_POINTS;
+        }
     }
+
+    private void HealthSystem_OnDead(object sender, EventArgs e)
+    {
+        LevelGrid.Instance.RemoveUnitAtGridPosition(gridPosition, this);
+        Destroy(gameObject);
+    }
+
 }

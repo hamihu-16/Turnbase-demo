@@ -34,9 +34,18 @@ public class GridObject {
         return unitList.Count > 0;
     }
 
+    public Unit GetUnit()
+    {
+        if (HasUnitInGridObject())
+        {
+            return unitList[0];
+        }
+        return null;
+    }
+
     public override string ToString()
     {
-        string unitListString = "";
+        string unitListString = "list count: " + unitList.Count + " ";
         foreach (Unit unit in unitList)
         {
             unitListString += unit + "\n";
