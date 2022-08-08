@@ -11,8 +11,7 @@ public class Unit : MonoBehaviour
 
     protected HealthSystem healthSystem;
     protected BaseAction[] baseActionArray;
-    protected MoveAction moveAction;
-    protected ShootAction shootAction;
+
 
     protected int actionPoints = MAX_ACTION_POINTS;
 
@@ -22,8 +21,6 @@ public class Unit : MonoBehaviour
     {
         healthSystem = GetComponent<HealthSystem>();
         baseActionArray = GetComponents<BaseAction>();
-        moveAction = GetComponent<MoveAction>();
-        shootAction = GetComponent<ShootAction>();
     }
 
     private void Start()
@@ -50,15 +47,18 @@ public class Unit : MonoBehaviour
         }
     }
 
-    public MoveAction GetMoveAction()
-    {
-        return this.moveAction;
+    public T GetAction<T>() where T : BaseAction
+    { 
+        foreach (BaseAction baseAction in baseActionArray)
+        {
+            if (baseAction is T)
+            {
+                return (T)baseAction;
+            }
+        }
+        return null;
     }
 
-    public ShootAction GetShoot()
-    {
-        return this.shootAction;
-    }
 
     public GridPosition GetGridPosition()
     {

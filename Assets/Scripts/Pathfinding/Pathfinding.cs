@@ -7,6 +7,7 @@ public class Pathfinding : MonoBehaviour
     public static Pathfinding Instance { get; private set; }
 
     [SerializeField] private Transform gridObjectTextPrefab;
+    [SerializeField] private LayerMask obstaclesLayerMask;
 
     [SerializeField] private int width;
     [SerializeField] private int height;
@@ -25,8 +26,38 @@ public class Pathfinding : MonoBehaviour
             return;
         }
         Instance = this;
-        gridSystem = new GridSystem<PathNode>(width, height, cellSize, (GridSystem<PathNode> gridSystem, GridPosition gridPosition) => new PathNode(gridPosition));
+        Initialize(LevelGrid.Instance.GetWidth(), LevelGrid.Instance.GetHeight(), LevelGrid.Instance.GetCellSize());
+    }
+
+    private void Initialize(int width, int height, float cellSize)
+    {
+        this.width = width;
+        this.height = height;
+        this.cellSize = cellSize;
+
+        gridSystem = new GridSystem<PathNode>(width, height, cellSize,
+            (GridSystem<PathNode> g, GridPosition gridPosition) => new PathNode(gridPosition));
+
         gridSystem.CreateDebugTextPrefabs(gridObjectTextPrefab);
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int z = 0; z < height; z++)
+            {
+                GridPosition gridPosition = new GridPosition(x, z);
+                Vector3 worldPosition = LevelGrid.Instance.GetWorldPositionInLevelGrid(gridPosition);
+                float raycastOffsetDistance = 5f;
+                if (Physics.Raycast(
+                    worldPosition + Vector3.down * raycastOffsetDistance,
+                    Vector3.up,
+                    raycastOffsetDistance * 2,
+                    obstaclesLayerMask))
+                {
+                    GetPathNode(x, z).SetWalkable(false);
+                }
+            }
+        }
+
     }
 
     public List<GridPosition> FindShortestPath(GridPosition start, GridPosition end)
@@ -37,10 +68,14 @@ public class Pathfinding : MonoBehaviour
 
         PathNode startNode = gridSystem.GetGridObjectFromGridPosition(start);
         PathNode endNode = gridSystem.GetGridObjectFromGridPosition(end);
-        
+
         openList.Add(startNode);
 
         InitPathNodes();
+
+        startNode.SetGCost(0);
+        startNode.SetHCost(CalculateDistance(startNode, endNode));
+        startNode.CalculateFCost();
 
         while (openList.Count > 0)
         {
@@ -54,7 +89,7 @@ public class Pathfinding : MonoBehaviour
             //if q = end then stop
             if (currentPathNode == endNode)
             {
-                return RetracePath(endNode, startNode);
+                return RetracePath(startNode, endNode);
             }
 
             //generate 8 surrounding nodes
@@ -65,6 +100,12 @@ public class Pathfinding : MonoBehaviour
             {
                 if (closedList.Contains(surroundPathNode))
                 {
+                    continue;
+                }
+
+                if (surroundPathNode.GetWalkable() == false)
+                {
+                    closedList.Add(surroundPathNode);
                     continue;
                 }
 
@@ -164,11 +205,12 @@ public class Pathfinding : MonoBehaviour
     private List<GridPosition> RetracePath(PathNode startNode, PathNode endNode)
     {
         List<PathNode> pathNodeList = new List<PathNode>();
+        pathNodeList.Add(endNode);
         PathNode currentNode = endNode;
 
-        while (currentNode != startNode)
+        while (currentNode.getParentPathNode() != null)
         {
-            pathNodeList.Add(currentNode);
+            pathNodeList.Add(currentNode.getParentPathNode());
             currentNode = currentNode.getParentPathNode();
         }
         pathNodeList.Reverse();
@@ -176,6 +218,7 @@ public class Pathfinding : MonoBehaviour
         List<GridPosition> path = new List<GridPosition>();
         foreach (PathNode pathNode in pathNodeList)
         {
+            Debug.Log("Pathfinding pathNodeList " + pathNode.GetGridPosition());
             path.Add(pathNode.GetGridPosition());
         }
         return path;

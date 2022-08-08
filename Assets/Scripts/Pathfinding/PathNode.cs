@@ -2,13 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PathNode : MonoBehaviour
+public class PathNode
 {
     private GridPosition gridPosition;
     private int gCost;
     private int hCost;
     private int fCost;
     private PathNode parentPathNode;
+    private bool isWalkable = true;
 
     public PathNode(GridPosition gridPosition)
     {
@@ -47,7 +48,7 @@ public class PathNode : MonoBehaviour
 
     public void CalculateFCost()
     {
-        this.fCost = gCost + hCost;
+        this.fCost = this.gCost + this.hCost;
     }
 
     public PathNode getParentPathNode()
@@ -59,4 +60,20 @@ public class PathNode : MonoBehaviour
     {
         this.parentPathNode = parentPathNode;
     }
+
+    public override string ToString()
+    {
+        return gridPosition.ToString();
+    }
+
+    public bool GetWalkable()
+    {
+        return this.isWalkable;
+    }
+
+    public void SetWalkable(bool isWalkable)
+    {
+        this.isWalkable = isWalkable;
+    }
+
 }

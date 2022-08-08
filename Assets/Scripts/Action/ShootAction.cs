@@ -26,7 +26,7 @@ public class ShootAction : BaseAction
     {
         base.Awake();
         unitAnimator = GetComponentInChildren<Animator>();
-        actionCost = 2;
+        actionCost = 1;
     }
 
     private void Update()
