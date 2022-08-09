@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -35,11 +36,14 @@ public class GridSystemVisual : MonoBehaviour
                 gridSystemVisualSingleGridArray[i, j] = gridSystemVisualSingleGridTransform.GetComponent<GridSystemVisualSingleGrid>();
             }
         }
+
+        UnitActionSystem.Instance.OnSelectedActionChanged += UnitActionSystem_OnSelectedActionChanged;
+        UpdateGridVisual();
     }
 
     private void Update()
     {
-        UpdateGridVisual();
+        //UpdateGridVisual();
     }
 
     public void HideAllGridPosition()
@@ -74,5 +78,10 @@ public class GridSystemVisual : MonoBehaviour
                 ShowGridPositionList(gridPositionList);
             }
         }
+    }
+
+    private void UnitActionSystem_OnSelectedActionChanged(object sender, EventArgs e)
+    {
+        UpdateGridVisual();
     }
 }

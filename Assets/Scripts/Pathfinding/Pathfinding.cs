@@ -38,7 +38,7 @@ public class Pathfinding : MonoBehaviour
         gridSystem = new GridSystem<PathNode>(width, height, cellSize,
             (GridSystem<PathNode> g, GridPosition gridPosition) => new PathNode(gridPosition));
 
-        gridSystem.CreateDebugTextPrefabs(gridObjectTextPrefab);
+        //gridSystem.CreateDebugTextPrefabs(gridObjectTextPrefab);
 
         for (int x = 0; x < width; x++)
         {
@@ -60,7 +60,7 @@ public class Pathfinding : MonoBehaviour
 
     }
 
-    public List<GridPosition> FindShortestPath(GridPosition start, GridPosition end)
+    public List<GridPosition> FindShortestPath(GridPosition start, GridPosition end, out int pathLength)
     {
         // init open and close lists
         List<PathNode> openList = new List<PathNode>();
@@ -89,6 +89,7 @@ public class Pathfinding : MonoBehaviour
             //if q = end then stop
             if (currentPathNode == endNode)
             {
+                pathLength = endNode.GetFCost();
                 return RetracePath(startNode, endNode);
             }
 
@@ -124,6 +125,7 @@ public class Pathfinding : MonoBehaviour
                 }
             }
         }
+        pathLength = endNode.GetFCost();
         return null;
     }
 
@@ -199,7 +201,7 @@ public class Pathfinding : MonoBehaviour
 
         if (distanceX > distanceZ)
             return MOVE_DIAGONAL_COST * distanceZ + MOVE_STRAIGHT_COST * (distanceX - distanceZ);
-        return MOVE_DIAGONAL_COST * distanceX + MOVE_DIAGONAL_COST * (distanceZ - distanceX);
+        return MOVE_DIAGONAL_COST * distanceX + MOVE_STRAIGHT_COST * (distanceZ - distanceX);
     }
 
     private List<GridPosition> RetracePath(PathNode startNode, PathNode endNode)
@@ -224,11 +226,21 @@ public class Pathfinding : MonoBehaviour
         return path;
     }
 
-    /*public void UpdateDuplicate(PathNode pathNode, List<PathNode> pathNodeList)
+    public bool IsGridPositionWalkable(GridPosition gridPosition)
     {
-        if (pathNodeList.Contains(pathNode))
-        {
-            pathNodeList.FindIndex();
-        }
-    }*/
+        return gridSystem.GetGridObjectFromGridPosition(gridPosition).GetWalkable();
+    }
+
+    public bool HasPath(GridPosition startGridPosition, GridPosition endGridPosition)
+    {
+        return FindShortestPath(startGridPosition, endGridPosition, out int pathLength) != null;
+    }
+
+    public int GetPathLength(GridPosition startGridPosition, GridPosition endGridPosition)
+    {
+        FindShortestPath(startGridPosition, endGridPosition, out int pathLength);
+        return pathLength;
+    }
+
+
 }

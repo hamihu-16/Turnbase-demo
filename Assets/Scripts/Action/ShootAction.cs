@@ -11,6 +11,7 @@ public class ShootAction : BaseAction
     private int shootRange = 2;
     private float hitDamage = 40f;
 
+    [SerializeField] private LayerMask obstaclesLayerMask;
     private Unit targetUnit;
 
     public event EventHandler<OnShootEventArgs> OnShoot;
@@ -20,7 +21,6 @@ public class ShootAction : BaseAction
         public Unit targetUnit;
         public Unit shootingUnit;
     }
-
 
     protected override void Awake()
     {
@@ -46,8 +46,6 @@ public class ShootAction : BaseAction
     {
         ActionStart(onActionComplete);
         targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(inputGridPosition);
-   
-        
     }
 
     public void HandleAction()
@@ -92,6 +90,21 @@ public class ShootAction : BaseAction
                 {
                     continue;
                 }
+
+                Vector3 unitWorldPosition = LevelGrid.Instance.GetWorldPositionInLevelGrid(unitGridPosition);
+                Vector3 shootDirection = (targetUnit.GetWorldPosition() - unitWorldPosition).normalized;
+
+                float unitShoulderHeight = 1.7f;
+                if (Physics.Raycast(
+                        unitWorldPosition + Vector3.up * unitShoulderHeight,
+                        shootDirection,
+                        Vector3.Distance(unitWorldPosition, targetUnit.GetWorldPosition()),
+                        obstaclesLayerMask))
+                {
+                    // Blocked by an Obstacle
+                    continue;
+                }
+
                 validGridPositionList.Add(testGridPosition);
             }
         }

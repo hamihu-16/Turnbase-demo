@@ -8,6 +8,7 @@ public abstract class BaseAction : MonoBehaviour
     protected Unit unit;
     protected bool isActive;
     protected Action onActionComplete;
+    //protected int actionCost = 1;
     protected int actionCost;
 
     protected virtual void Awake()

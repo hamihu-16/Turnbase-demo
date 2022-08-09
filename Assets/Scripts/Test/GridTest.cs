@@ -13,7 +13,7 @@ public class GridTest : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.T))
         {
-            GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPositionInLevelGrid(MouseWorld.GetMousePosition());
+            /*GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPositionInLevelGrid(MouseWorld.GetMousePosition());
             GridPosition startGridPosition = new GridPosition(0, 0);
 
             List<GridPosition> gridPositionList = Pathfinding.Instance.FindShortestPath(startGridPosition, mouseGridPosition);
@@ -26,7 +26,7 @@ public class GridTest : MonoBehaviour
                     Color.white,
                     100f
                 );
-            }
+            }*/
         }
 
     }
