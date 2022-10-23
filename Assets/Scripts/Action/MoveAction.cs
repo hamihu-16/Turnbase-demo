@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using UnityEngine;
 
 public class MoveAction : BaseAction
@@ -8,7 +9,7 @@ public class MoveAction : BaseAction
     private float rotateSpeed = 10f;
     private float moveSpeed = 4f;
     private float stoppingDistance = 0.2f;
-    private int moveRange = 4;
+    [SerializeField] private int moveRange = 4;
 
     private List<Vector3> positionList;
     private int currentPositionIndex;
@@ -46,6 +47,8 @@ public class MoveAction : BaseAction
 
         ActionStart(onActionComplete);
         OnStartMoving?.Invoke(this, EventArgs.Empty);
+        Debug.Log("OnStartMoving");
+        Debug.Log(positionList[positionList.Count - 1]);
     }
 
     public void HandleAction()
@@ -65,6 +68,7 @@ public class MoveAction : BaseAction
             {
                 OnStopMoving?.Invoke(this, EventArgs.Empty);
                 ActionComplete();
+                Debug.Log("OnStopMoving");
             }
         }
     }
@@ -118,4 +122,34 @@ public class MoveAction : BaseAction
     {
         return this.actionCost;
     }
+
+    public int GetMoveRange()
+    {
+        return this.moveRange;
+    }
+
+    public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
+    {
+        int targetCountAtGridPosition;
+        if (unit.GetShootAction() != null)
+        {
+            targetCountAtGridPosition = unit.GetShootAction().GetTargetCountAtPosition(gridPosition);
+        }
+        else
+        {
+            if (gridPosition.x == 3)
+            {
+                Debug.Log("");
+            }
+            targetCountAtGridPosition = unit.GetSwordAction().GetTargetCountAtPosition(gridPosition);            
+        }
+
+
+        return new EnemyAIAction
+        {
+            gridPosition = gridPosition,
+            actionValue = targetCountAtGridPosition * 10,
+        };
+    }
+
 }

@@ -6,9 +6,9 @@ using UnityEngine;
 public class ShootAction : BaseAction
 {
     private Animator unitAnimator;
+    private RangedAnimationEventHandler rangedAnimationEventHandler;
 
-    private float rotateSpeed = 10f;
-    private int shootRange = 2;
+    private int shootRange = 4;
     private float hitDamage = 40f;
 
     [SerializeField] private LayerMask obstaclesLayerMask;
@@ -27,6 +27,10 @@ public class ShootAction : BaseAction
         base.Awake();
         unitAnimator = GetComponentInChildren<Animator>();
         actionCost = 1;
+
+        rangedAnimationEventHandler = GetComponentInChildren<RangedAnimationEventHandler>();
+        rangedAnimationEventHandler.OnProjectileFired += RangedAnimationEventHandler_OnProjectileFired;
+        rangedAnimationEventHandler.OnProjectileComplete += RangedAnimationEventHandler_OnProjectileComplete;
     }
 
     private void Update()
@@ -46,13 +50,13 @@ public class ShootAction : BaseAction
     {
         ActionStart(onActionComplete);
         targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(inputGridPosition);
+        Shoot();
     }
 
     public void HandleAction()
     {      
         Vector3 shootDirection = (targetUnit.GetWorldPosition() - transform.position).normalized;
         transform.forward = shootDirection;
-        Shoot();
     }
 
     private void Shoot()
@@ -62,53 +66,106 @@ public class ShootAction : BaseAction
             targetUnit = targetUnit,
             shootingUnit = unit
         });
-
-        targetUnit.TakeDamage(hitDamage);
-        Debug.Log(targetUnit.transform.name + " dmged");
-        ActionComplete();
     }
 
     public override List<GridPosition> GetValidGridPositionList()
     {
-        List<GridPosition> validGridPositionList = new List<GridPosition>();
         GridPosition unitGridPosition = unit.GetGridPosition();
+        return GetValidActionGridPositionList(unitGridPosition);
+    }
+
+    public List<GridPosition> GetValidActionGridPositionList(GridPosition unitGridPosition)
+    {
+        List<GridPosition> validGridPositionList = new List<GridPosition>();
         for (int i = -shootRange; i <= shootRange; i++)
         {
             for (int j = -shootRange; j <= shootRange; j++)
             {
                 GridPosition offsetGridPosition = new GridPosition(i, j);
-                GridPosition testGridPosition = unitGridPosition + offsetGridPosition;
-                if (!LevelGrid.Instance.isValidGridPosition(testGridPosition)
-                    || unitGridPosition == testGridPosition
-                    || !LevelGrid.Instance.IsGridOccupied(testGridPosition))
+                GridPosition checkGridPosition = unitGridPosition + offsetGridPosition;
+                // grid is outside of level
+                if (!LevelGrid.Instance.isValidGridPosition(checkGridPosition)) {
+                    continue;
+                }
+
+                // checkGrid is the grid the unit is standing on
+                if (unitGridPosition == checkGridPosition)
                 {
                     continue;
                 }
 
-                Unit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(testGridPosition);
+                // if the grid has no unit on it
+                if (!LevelGrid.Instance.IsGridOccupied(checkGridPosition))
+                {
+                    continue;
+                }
+
+                Unit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(checkGridPosition);
+                // target is on the same team
                 if (unit.IsEnemy() == targetUnit.IsEnemy())
                 {
                     continue;
                 }
 
-                Vector3 unitWorldPosition = LevelGrid.Instance.GetWorldPositionInLevelGrid(unitGridPosition);
-                Vector3 shootDirection = (targetUnit.GetWorldPosition() - unitWorldPosition).normalized;
-
-                float unitShoulderHeight = 1.7f;
-                if (Physics.Raycast(
-                        unitWorldPosition + Vector3.up * unitShoulderHeight,
-                        shootDirection,
-                        Vector3.Distance(unitWorldPosition, targetUnit.GetWorldPosition()),
-                        obstaclesLayerMask))
+                if (targetUnit.GetHealth() <= 0)
                 {
-                    // Blocked by an Obstacle
+                    continue;
+                }
+                
+                if (IsBlockedByObstacle(targetUnit))
+                {
                     continue;
                 }
 
-                validGridPositionList.Add(testGridPosition);
+                validGridPositionList.Add(checkGridPosition);
             }
         }
         return validGridPositionList;
+    }
+
+    public bool IsBlockedByObstacle(Unit targetUnit)
+    {
+        Vector3 unitWorldPosition = LevelGrid.Instance.GetWorldPositionInLevelGrid(unit.GetGridPosition());
+        Vector3 shootDirection = (targetUnit.GetWorldPosition() - unitWorldPosition).normalized;
+
+        float unitShoulderHeight = 1.7f;
+        if (Physics.Raycast(
+                unitWorldPosition + Vector3.up * unitShoulderHeight,
+                shootDirection,
+                Vector3.Distance(unitWorldPosition, targetUnit.GetWorldPosition()),
+                obstaclesLayerMask))
+        {
+            // Blocked by an Obstacle
+            return true;
+        }
+
+        return false;
+    }
+
+    public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
+    {
+        Unit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
+
+        return new EnemyAIAction
+        {
+            gridPosition = gridPosition,
+            actionValue = 100 + Mathf.RoundToInt(100 - targetUnit.GetHealth()),
+        };
+    }
+
+    private void RangedAnimationEventHandler_OnProjectileFired(object sender, EventArgs e)
+    {
+        targetUnit.TakeDamage(hitDamage);
+    }
+
+    private void RangedAnimationEventHandler_OnProjectileComplete(object sender, EventArgs e)
+    {
+        ActionComplete();
+    }
+
+    public int GetTargetCountAtPosition(GridPosition gridPosition)
+    {
+        return GetValidGridPositionList().Count;
     }
 
     public override string GetActionName()
@@ -120,4 +177,15 @@ public class ShootAction : BaseAction
     {
         return this.actionCost;
     }
+
+    public int GetShootRange()
+    {
+        return this.shootRange;
+    }
+
+    public float GetDamage()
+    {
+        return this.hitDamage;
+    }
+
 }

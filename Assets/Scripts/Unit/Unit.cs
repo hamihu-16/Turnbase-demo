@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Unit : MonoBehaviour
 {
@@ -12,10 +13,13 @@ public class Unit : MonoBehaviour
     protected HealthSystem healthSystem;
     protected BaseAction[] baseActionArray;
 
-
     protected int actionPoints = MAX_ACTION_POINTS;
+    public static EventHandler OnAnyActionPointsChanged;
 
-    [SerializeField] protected bool isEnemy;
+    public static EventHandler OnAnyUnitSpawned;
+    public static EventHandler OnAnyUnitDead;
+
+    [SerializeField] private bool isEnemy;
 
     private void Awake()
     {
@@ -30,6 +34,7 @@ public class Unit : MonoBehaviour
 
         TurnSystem.Instance.OnTurnEnd += TurnSystem_OnTurnEnd;
         healthSystem.OnDead += HealthSystem_OnDead;
+        OnAnyUnitSpawned?.Invoke(this, EventArgs.Empty);
     }
 
     private void Update()
@@ -42,8 +47,9 @@ public class Unit : MonoBehaviour
         GridPosition newGridPosition = LevelGrid.Instance.GetGridPositionInLevelGrid(transform.position);
         if (newGridPosition != gridPosition)
         {
-            LevelGrid.Instance.UpdateUnitGridPosition(this, gridPosition, newGridPosition);
+            GridPosition oldGridPosition = gridPosition;
             gridPosition = newGridPosition;
+            LevelGrid.Instance.UpdateUnitGridPosition(this, oldGridPosition, newGridPosition);
         }
     }
 
@@ -59,7 +65,10 @@ public class Unit : MonoBehaviour
         return null;
     }
 
-
+    public bool IsEnemy()
+    {
+        return isEnemy;
+    }
     public GridPosition GetGridPosition()
     {
         return this.gridPosition;
@@ -92,10 +101,7 @@ public class Unit : MonoBehaviour
     public void SpendActionPoints(BaseAction baseAction)
     {
         this.actionPoints -= baseAction.GetActionCost();
-    }
-    public bool IsEnemy()
-    {
-        return this.isEnemy;
+        OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public void TakeDamage(float damage)
@@ -103,12 +109,33 @@ public class Unit : MonoBehaviour
         healthSystem.TakeDamage(damage);
     }
 
-    public void TurnSystem_OnTurnEnd(object sender, EventArgs e)
+    public void Heal(float healAmount)
     {
-        if ((isEnemy && !TurnSystem.Instance.IsPlayerTurn()) 
-            || (!isEnemy && TurnSystem.Instance.IsPlayerTurn()))
+        healthSystem.TakeDamage(healAmount);
+    }
+
+    public float GetHealth()
+    {
+        return healthSystem.GetHealth();
+    }
+
+    public ShootAction GetShootAction()
+    {
+        return GetComponent<ShootAction>();
+    }
+
+    public SwordAction GetSwordAction()
+    {
+        return GetComponent<SwordAction>();
+    }
+
+    virtual public void TurnSystem_OnTurnEnd(object sender, EventArgs e)
+    {
+        if ((IsEnemy() && !TurnSystem.Instance.IsPlayerTurn())
+            || (!IsEnemy() && TurnSystem.Instance.IsPlayerTurn()))
         {
             this.actionPoints = MAX_ACTION_POINTS;
+            OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -116,6 +143,7 @@ public class Unit : MonoBehaviour
     {
         LevelGrid.Instance.RemoveUnitAtGridPosition(gridPosition, this);
         Destroy(gameObject);
+        OnAnyUnitDead?.Invoke(this, EventArgs.Empty);
     }
 
 }

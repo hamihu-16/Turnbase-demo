@@ -38,18 +38,15 @@ public class GridSystemVisual : MonoBehaviour
         }
 
         UnitActionSystem.Instance.OnSelectedActionChanged += UnitActionSystem_OnSelectedActionChanged;
+        LevelGrid.Instance.OnAnyUnitMove += LevelGrid_OnAnyUnitMove;
         UpdateGridVisual();
-    }
 
-    private void Update()
-    {
-        //UpdateGridVisual();
     }
 
     public void HideAllGridPosition()
     {
         // why not hide right after instantiate?
-        for (int i = 0; i < gridSystemVisualSingleGridArray.GetLength(0); i++) 
+        for (int i = 0; i < gridSystemVisualSingleGridArray.GetLength(0); i++)
         {
             for (int j = 0; j < gridSystemVisualSingleGridArray.GetLength(1); j++)
             {
@@ -81,6 +78,11 @@ public class GridSystemVisual : MonoBehaviour
     }
 
     private void UnitActionSystem_OnSelectedActionChanged(object sender, EventArgs e)
+    {
+        UpdateGridVisual();
+    }
+
+    private void LevelGrid_OnAnyUnitMove(object sender, EventArgs e)
     {
         UpdateGridVisual();
     }

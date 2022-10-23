@@ -7,6 +7,8 @@ using TMPro;
 
 public class UnitActionSystemUI : MonoBehaviour
 {
+    // add event to change remaining action point here
+
     [SerializeField] private Transform unitActionButtonUIPrefab;
     [SerializeField] private Transform unitActionButtonContainer;
     [SerializeField] private Transform unitActionBusyUI;
@@ -19,6 +21,8 @@ public class UnitActionSystemUI : MonoBehaviour
         UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
         UnitActionSystem.Instance.OnSelectedActionChanged += UnitActionSystem_OnSelectedActionChanged;
         UnitActionSystem.Instance.OnActionStarted += UnitActionSystem_OnActionStarted;
+        Unit.OnAnyActionPointsChanged += Unit_OnAnyActionPointsChanged;
+
         TurnSystem.Instance.OnTurnEnd += TurnSystem_OnTurnEnd;
 
         unitActionButtonUIList = new List<UnitActionButtonUI>();
@@ -87,6 +91,11 @@ public class UnitActionSystemUI : MonoBehaviour
     }
 
     private void TurnSystem_OnTurnEnd(object sender, EventArgs e)
+    {
+        HandleActionPointUI();
+    }
+
+    private void Unit_OnAnyActionPointsChanged(object sender, EventArgs e)
     {
         HandleActionPointUI();
     }

@@ -46,10 +46,12 @@ public class TurnSystemUI : MonoBehaviour
         if (TurnSystem.Instance.IsPlayerTurn())
         {
             enemyTurnUI.SetActive(false);
+            endTurnButton.gameObject.SetActive(true);
         }
         else
         {
             enemyTurnUI.SetActive(true);
+            endTurnButton.gameObject.SetActive(false);
         } 
     }
 }

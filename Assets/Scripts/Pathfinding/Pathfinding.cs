@@ -220,7 +220,6 @@ public class Pathfinding : MonoBehaviour
         List<GridPosition> path = new List<GridPosition>();
         foreach (PathNode pathNode in pathNodeList)
         {
-            Debug.Log("Pathfinding pathNodeList " + pathNode.GetGridPosition());
             path.Add(pathNode.GetGridPosition());
         }
         return path;
@@ -230,6 +229,12 @@ public class Pathfinding : MonoBehaviour
     {
         return gridSystem.GetGridObjectFromGridPosition(gridPosition).GetWalkable();
     }
+
+    public void SetIsWalkableGridPosition(GridPosition gridPosition, bool isWalkable)
+    {
+        gridSystem.GetGridObjectFromGridPosition(gridPosition).SetWalkable(isWalkable);
+    }
+
 
     public bool HasPath(GridPosition startGridPosition, GridPosition endGridPosition)
     {

@@ -8,8 +8,10 @@ public abstract class BaseAction : MonoBehaviour
     protected Unit unit;
     protected bool isActive;
     protected Action onActionComplete;
-    //protected int actionCost = 1;
-    protected int actionCost;
+    protected int actionCost = 1;
+    //protected int actionCost;
+
+    protected int actionValue;
 
     protected virtual void Awake()
     {
@@ -28,8 +30,6 @@ public abstract class BaseAction : MonoBehaviour
         onActionComplete();
     }
 
-    public abstract string GetActionName();
-
     public virtual bool IsValidGridPosition(GridPosition gridPosition)
     {
         List<GridPosition> validGridPositionList = GetValidGridPositionList();
@@ -40,5 +40,32 @@ public abstract class BaseAction : MonoBehaviour
 
     public abstract void PerformAction(GridPosition gridPosition, Action onActionCompleted);
 
+    public EnemyAIAction GetBestEnemyAIAction()
+    {
+        List<EnemyAIAction> enemyAIActionList = new List<EnemyAIAction>();
+
+        List<GridPosition> validActionGridPositionList = GetValidGridPositionList();
+
+        foreach (GridPosition gridPosition in validActionGridPositionList)
+        {
+            EnemyAIAction enemyAIAction = GetEnemyAIAction(gridPosition);
+            enemyAIActionList.Add(enemyAIAction);
+        }
+
+        if (enemyAIActionList.Count > 0)
+        {
+            enemyAIActionList.Sort((EnemyAIAction a, EnemyAIAction b) => b.actionValue - a.actionValue);
+            return enemyAIActionList[0];
+        }
+
+        // No possible Enemy AI Actions
+        return null;
+
+    }
+
+    public abstract EnemyAIAction GetEnemyAIAction(GridPosition gridPosition);
+
     public abstract int GetActionCost();
+
+    public abstract string GetActionName();
 }
